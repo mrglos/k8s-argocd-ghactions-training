@@ -1,7 +1,7 @@
 replicaCount: 2
 
-app:
-  message: "Auto-sync is pure magic!"
+# app:
+#   message: "Auto-sync is pure magic!"
 
 image:
   repository: ghcr.io/mrglos/k8s-argocd-ghactions-training

@@ -8,7 +8,8 @@ import (
 
 func main() {
 	// Accept the exact same -text flag our Helm chart is currently passing
-	textPtr := flag.String("text", "Default Go Hello", "Text to display")
+	// textPtr := flag.String("text", "Default Go Hello", "Text to display")
+	textPtr := flag.String("text", "I AM UNSTOPPABLE. GITOPS IS REAL.", "Text to display")
 	flag.Parse()
 
 	// Create a simple web server
