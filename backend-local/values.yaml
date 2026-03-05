@@ -1,4 +1,4 @@
-replicaCount: 3
+replicaCount: 5
 
 app:
-  message: "hello from Helm templating!"
+  message: "hello from GitOps!"
