@@ -1,0 +1,35 @@
+# vim: set filetype=helm:
+# backend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: hashicorp/http-echo
+          args:
+            - "-text={{ .Values.app.message }}"
+          ports:
+            - containerPort: 5678
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5678
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /wrong
+              port: 5678
+            initialDelaySeconds: 3
+            periodSeconds: 3
