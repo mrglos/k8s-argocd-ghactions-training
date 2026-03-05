@@ -2,3 +2,7 @@ replicaCount: 2
 
 app:
   message: "Auto-sync is pure magic!"
+
+image:
+  repository: ghcr.io/mrglos/k8s-argocd-ghactions-training
+  tag: main # We will use 'main' for a quick test, but we'll automate the exact SHA tags in a minute!
