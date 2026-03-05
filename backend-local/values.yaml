@@ -5,4 +5,4 @@ replicaCount: 2
 
 image:
   repository: ghcr.io/mrglos/k8s-argocd-ghactions-training
-  tag: sha-68e3071
+  tag: sha-3fe175d
