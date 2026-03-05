@@ -1,4 +1,4 @@
-replicaCount: 5
+replicaCount: 2
 
 app:
-  message: "hello from GitOps!"
+  message: "Auto-sync is pure magic!"
