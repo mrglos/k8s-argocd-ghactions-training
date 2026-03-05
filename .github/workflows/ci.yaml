@@ -1,14 +1,12 @@
 name: Build and Push Docker Image
 
-# 1. THE TRIGGER: When does this run?
 on:
   push:
     branches:
       - main
     paths:
-      - "app/**" # ONLY run if files inside the 'app' folder change
+      - "app/**" # Only run when application code changes!
 
-# 2. THE ENVIRONMENT: Where are we pushing the image?
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -17,9 +15,8 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    # Give the robot permission to push to your GitHub registry
     permissions:
-      contents: read
+      contents: write # <-- CHANGED: The robot now has permission to write code!
       packages: write
 
     steps:
@@ -31,15 +28,13 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }} # GitHub provides this automatically!
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract metadata (tags) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # We tag the image with the short Git commit hash (e.g., sha-a1b2c3d)
-          # This is the ultimate GitOps best practice!
           tags: |
             type=sha,format=short
 
@@ -50,3 +45,23 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      # --- THE NEW MAGIC STEPS ---
+      - name: Update values.yaml with new image tag
+        run: |
+          # Get the first 7 characters of the Git commit hash
+          SHORT_SHA="${GITHUB_SHA::7}"
+
+          # Use sed to find the line starting with "tag:" and replace it with our new tag
+          sed -i "s/tag: .*/tag: sha-${SHORT_SHA}/" backend-local/values.yaml
+
+      - name: Commit and push changes
+        run: |
+          # Tell Git who is making this commit
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Add the modified values.yaml, commit, and push!
+          git add backend-local/values.yaml
+          git commit -m "cd: automatically update image tag to sha-${GITHUB_SHA::7}"
+          git push
