@@ -17,8 +17,6 @@ spec:
       containers:
         - name: backend
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          # args:
-          #   - "-text={{ .Values.app.message }}"
           ports:
             - containerPort: 5678
           livenessProbe:
