@@ -1,0 +1,52 @@
+name: Build and Push Docker Image
+
+# 1. THE TRIGGER: When does this run?
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**" # ONLY run if files inside the 'app' folder change
+
+# 2. THE ENVIRONMENT: Where are we pushing the image?
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    # Give the robot permission to push to your GitHub registry
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }} # GitHub provides this automatically!
+
+      - name: Extract metadata (tags) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          # We tag the image with the short Git commit hash (e.g., sha-a1b2c3d)
+          # This is the ultimate GitOps best practice!
+          tags: |
+            type=sha,format=short
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./app
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
